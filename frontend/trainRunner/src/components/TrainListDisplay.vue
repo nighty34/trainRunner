@@ -19,12 +19,10 @@ const search = ref("");
 const filter = (list, filterTerm) => {
   let result = []
 
-  console.log(filterTerm)
   list.forEach(element => {
     (filterTerm === '' || element.address.includes(filterTerm) || element.name.includes(filterTerm)) ? result.push(element) : console.log("filtered")
   });
 
-  console.log(result)
   return result
 }
 

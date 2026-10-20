@@ -1,5 +1,4 @@
 import { ref } from 'vue'
-import { getRoster } from '@/WebSocketService/JRMISocket'
 import { useJRMISocketStore } from '@/stores/JMRISocketStore'
 
 const jmriStore = useJRMISocketStore()

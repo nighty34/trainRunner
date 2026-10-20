@@ -36,10 +36,10 @@ export const useJRMISocketStore = defineStore('jmrisocket', () => {
         return sendCommand(command);
     }
 
-    async function subscribeToThrottle(trainAddress: number, callback: Function) {
-        const throttleIdentifier = crypto.randomUUID()
-        activeThrottles.set(throttleIdentifier, callback)
-        const command = {"type":"throttle", "data":{"name": throttleIdentifier, "address" : trainAddress}}
+    async function subscribeToThrottle(trainAddress: number, throttleName: string, callback: Function) {
+        
+        activeThrottles.set(throttleName, callback)
+        const command = {"type":"throttle", "data":{"name": throttleName, "address" : trainAddress}}
 
         sendCommand(command, false);
     }

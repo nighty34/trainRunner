@@ -1,20 +1,21 @@
 <template>
-   <div v-for="entry in throttles">
-    {{entry[0]}} : {{ entry[1] }}
-   </div>
+   <SpeedIndicator :trainAddress="Number(trainAddress)" />
 </template>
 
 <script setup>
 import { useRoute } from 'vue-router';
-import { subscribeByTrainAddress, throttles } from '@/stores/throttleStore';
+import { useThrottleStore } from '@/stores/throttleStore';
 import { onMounted } from 'vue';
-
+import SpeedIndicator from './SpeedIndicator.vue';
 const route = useRoute()
+const trainAddress = route.params.trainAddress;
+const throttleStore = useThrottleStore()
 
 onMounted(() => {
-   if (route.params.trainAddress){
-      subscribeByTrainAddress(route.params.trainAddress)
+   if (trainAddress){
+      throttleStore.subscribeByTrainAddress(trainAddress)
    }
 })
+
 
 </script>

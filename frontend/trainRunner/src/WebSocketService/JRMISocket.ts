@@ -2,46 +2,66 @@ import { WebsocketBuilder, ArrayQueue, Websocket, ConstantBackoff, WebsocketEven
 
 let ws: any;
 const pendingRequests = new Map();
+const activeThrottles = new Map();
 
 const heartBeatRate = 2000;
 let nextId = 1;
 
-const sendCommand = (command: any) => {
+const sendCommand = (command: any, noResponse?: boolean) => {
   if (ws?.readyState === WebSocket.OPEN) {
-    return new Promise((resolve, reject) => {
-        const id = nextId++;
+    if (!noResponse){
+        return new Promise((resolve, reject) => {
+            const id = nextId++;
 
-        pendingRequests.set(id, {resolve, reject});
-        command['id'] = id
-        ws.send(JSON.stringify(command));
-    })
+            pendingRequests.set(id, {resolve, reject});
+            command['id'] = id;
+            ws.send(JSON.stringify(command));
+        })
+    } else {
+        command['id'] = -1;
+        ws.send(JSON.stringify(command))
+    }
+    
   } 
 
   console.error('WebSocket ist nicht verbunden');
 }
 
-
 async function getRoster() {
     const command = {"list":"roster"}
-    const response = await sendCommand(command);
-
-    return response;
+    return sendCommand(command);
 }
+
+async function subscribeToThrottle(trainAddress: number, callback: Function) {
+    const throttleIdentifier = crypto.randomUUID()
+    activeThrottles.set(throttleIdentifier, callback)
+    const command = {"type":"throttle", "data":{"name": throttleIdentifier, "address" : trainAddress}}
+
+    sendCommand(command, true);
+}
+
 
 const connect = (socketIP: string) => {
     const handleMessages = (i: Websocket, ev: MessageEvent) => {
         try{
             const response = JSON.parse(ev.data);
             
-            const pending = pendingRequests.get(response.id)
+            if (response.id) {
+                const pending = pendingRequests.get(response.id)
 
-            if (pending) {
-                pendingRequests.delete(response.id);
-                pending.resolve(response);
+                if (pending) {
+                    pendingRequests.delete(response.id);
+                    pending.resolve(response);
+                }
+            } else if (response.type === "throttle"){
+                const callback = activeThrottles.get(response.data.throttle)
+                callback(response.data)
+            } else {
+                console.log(`Received unindexed response: ${response}`)
             }
         }catch(e){
-            console.log(`Received Unrequested Message: ${ev.data}`);
-        }        
+            console.log(`Received string that couldn't be parsed: ${ev.data}`);
+        }
     }
 
 
@@ -59,6 +79,7 @@ const connect = (socketIP: string) => {
 }
 
 export {
+    subscribeToThrottle,
     connect,
     getRoster,
 }

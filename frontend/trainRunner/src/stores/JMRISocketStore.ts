@@ -37,11 +37,20 @@ export const useJRMISocketStore = defineStore('jmrisocket', () => {
     }
 
     async function subscribeToThrottle(trainAddress: number, throttleName: string, callback: Function) {
-        
         activeThrottles.set(throttleName, callback)
         const command = {"type":"throttle", "data":{"name": throttleName, "address" : trainAddress}}
 
         sendCommand(command, false);
+    }
+
+    function setThrottleSpeed(throttleName: string, speed: number) {
+        const command = {"type":"throttle", "data":{"name":throttleName, "speed":speed}}
+        return sendCommand(command);
+    }
+
+    function setThrottleDirection(throttleName: string, forward: boolean) {
+        const command = {"type":"throttle", "data":{"name":throttleName, "forward":forward}}
+        return sendCommand(command);
     }
 
 
@@ -89,6 +98,8 @@ export const useJRMISocketStore = defineStore('jmrisocket', () => {
         subscribeToThrottle,
         connect,
         getRoster,
+        setThrottleSpeed,
+        setThrottleDirection,
     }
 })
 

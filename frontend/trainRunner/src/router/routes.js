@@ -3,8 +3,8 @@ const routes = [
     path: '/',
     component: () => import('@/layouts/MainLayout.vue'),
     children: [
-      { path: '', component: () => import('@/pages/IndexPage.vue') },
-      { path: 'second', component: () => import('@/pages/Throttle.vue') }
+      { path: '/', component: () => import('@/pages/IndexPage.vue') },
+      { path: '/throttle/:trainAddress', name: 'throttle', component: () => import('@/pages/ThrottlePage.vue') }
     ]
   },
 

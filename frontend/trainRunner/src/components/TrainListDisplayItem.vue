@@ -1,5 +1,5 @@
 <template>
-   <q-card flat bordered class="q-ma-sm train-card">
+   <q-card flat bordered class="q-ma-sm train-card" @click="clickOnTrain(trainAddress)">
     <q-card-section>
       <div class="q-px-lg">
         <q-img class="vertical-bottom q-px-sm" alt="NO IMAGE" :src="'data:image/png;base64,' + trainIcon" />
@@ -12,12 +12,20 @@
 </template>
 
 <script setup lang="ts">
-
+import { useRouter } from 'vue-router';
 const props = defineProps({
   trainName: String,
   trainAddress: String,
   trainIcon: String,
 })
+
+const router = useRouter()
+
+const clickOnTrain = (trainAddress?: string) => {
+  if (trainAddress) {
+     router.push({name: 'throttle', params: {trainAddress: trainAddress}})
+  }
+}
 
 </script>
 

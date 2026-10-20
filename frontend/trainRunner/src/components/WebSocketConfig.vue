@@ -12,11 +12,13 @@
 
 <script setup>
 import { ref } from 'vue'
-import { connect } from '@/WebSocketService/JRMISocket'
+import { useJRMISocketStore } from '@/stores/JMRISocketStore'
+
+const jrmiStore = useJRMISocketStore()
 const websocketIP = ref("localhost:12080")
 
 const makeConnection = () => {
-  connect(websocketIP.value);
+  jrmiStore.connect(websocketIP.value);
 }
 
 

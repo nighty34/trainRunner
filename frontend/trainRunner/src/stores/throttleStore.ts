@@ -1,8 +1,8 @@
 import { ref } from 'vue'
-import { subscribeToThrottle } from '@/WebSocketService/JRMISocket'
+import { useJRMISocketStore } from './JMRISocketStore';
 
 const throttles = ref(new Map())
-
+const jrmisocket = useJRMISocketStore()
 
 const updateThrottleCallback = (response: any) => {
     const throttleData = throttles.value.get(response.address);
@@ -11,7 +11,7 @@ const updateThrottleCallback = (response: any) => {
 
 const subscribeByTrainAddress = (trainAddress: number) => {
     throttles.value.set(trainAddress, {});
-    subscribeToThrottle(trainAddress, updateThrottleCallback);
+    jrmisocket.subscribeToThrottle(trainAddress, updateThrottleCallback);
 }
 
 

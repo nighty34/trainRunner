@@ -1,7 +1,8 @@
 import { ref } from 'vue'
 import { getRoster } from '@/WebSocketService/JRMISocket'
-// import API and Type
+import { useJRMISocketStore } from '@/stores/JMRISocketStore'
 
+const jmriStore = useJRMISocketStore()
 
 const trains = ref<any[]>([])
 const loading = ref(false)
@@ -12,8 +13,9 @@ async function fetchTrains() {
     error.value = null
 
     try {
+        const response: any = await jmriStore.getRoster();
+        
         trains.value = []
-        const response: any = await getRoster();
         response.data.forEach((element: { data: any }) => trains.value.push(element.data));
     } catch {
         error.value = 'Error'

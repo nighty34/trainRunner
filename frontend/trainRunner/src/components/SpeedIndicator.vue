@@ -22,10 +22,8 @@
 <script setup>
 import { useThrottleStore } from '@/stores/throttleStore';
 import { computed } from 'vue';
-import { useRoute } from 'vue-router';
 
 const throttleStore = useThrottleStore()
-const route = useRoute()
 
 const props = defineProps({
    trainAddress: Number

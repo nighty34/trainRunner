@@ -1,5 +1,6 @@
 import { computed, ref } from 'vue'
 import { useJRMISocketStore } from './JMRISocketStore';
+import { trains } from '@/composables/useTrains';
 import { defineStore } from 'pinia';
 
 
@@ -35,6 +36,11 @@ export const useThrottleStore = defineStore('throttleStore', () => {
         jrmisocket.subscribeToThrottle(trainAddress, throttleIdentifier, updateThrottleCallback);
     }
 
+    const setThrottleSpeed = (trainAddress: number, speed: number) => {
+        const throttleName = getThrottleNameByAddress(trainAddress)
+        jrmisocket.setThrottleSpeed(throttleName, speed);
+    }
+
     const getThrottleSpeed = (trainAddress: number) => {
         return computed({
             get: () => {return throttles.value.get(trainAddress)?.speed ?? -1},
@@ -60,13 +66,34 @@ export const useThrottleStore = defineStore('throttleStore', () => {
         });
     }
 
+    const getAllActiveThrottles = () => {
+        
+        let activeThrottles = new Map()
+        for (var key in throttles.value.keys()) {
+            let newThrottle: any = {}
+            const currentAddress = throttles.value.get(key)?.address;
+
+            newThrottle.address = currentAddress;
+            const trainReference = trains.value?.filter(element => element.address === currentAddress)[0];
+
+            newThrottle.icon = trainReference?.comment ?? '';
+            newThrottle.name = trainReference?.name ?? '';
+
+
+            activeThrottles.set(currentAddress, newThrottle)
+        }
+        return activeThrottles
+    }
+
 
     return {
         throttles,
         subscribeByTrainAddress,
+        setThrottleSpeed,
         getThrottleSpeed,
         getThrottleDirection,
         setThrottleDirection,
+        getAllActiveThrottles,
     }
 })
 

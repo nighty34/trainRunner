@@ -21,19 +21,36 @@
 
 <script setup>
 import { useThrottleStore } from '@/stores/throttleStore';
+import { computed } from 'vue';
+import { useRoute } from 'vue-router';
 
-const throttelStore = useThrottleStore()
+const throttleStore = useThrottleStore()
+const route = useRoute()
 
 const props = defineProps({
-  trainAddress: Number
+   trainAddress: Number
 })
 
-const trainAddress = props.trainAddress;
-const speed = throttelStore.getThrottleSpeed(trainAddress);
-const forward = throttelStore.getThrottleDirection(trainAddress);
+const train = computed(() => props.trainAddress)
+
+const speed = computed({
+  get: () => throttleStore.getThrottleSpeed(train.value).value,
+  set: (value) => {
+    throttleStore.getThrottleSpeed(train.value).value = value
+  }
+})
+
+const forward = computed(
+  () => throttleStore.getThrottleDirection(train.value).value
+)
+
 const setForward = (isForward) => {
-   throttelStore.setThrottleDirection(trainAddress, isForward);
-}
+   console.log(train)
+   throttleStore.setThrottleDirection(
+    train.value,
+    isForward
+  );  
+};
 
 </script>
 <style lang="sass">
